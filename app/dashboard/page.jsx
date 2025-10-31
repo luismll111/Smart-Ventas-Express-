@@ -125,97 +125,194 @@ export default function Dashboard(){
         {/* Banner de deuda */}
         <DebtBanner/>
 
-        {/* Estadísticas principales */}
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard 
-            title="Ventas del mes" 
-            value="S/ 5,230" 
-            change="+12.5%" 
-            trend="up"
-            icon={DollarSign}
-            color="green"
-          />
-          <StatCard 
-            title="Transacciones" 
-            value="320" 
-            change="+8.3%" 
-            trend="up"
-            icon={ShoppingCart}
-            color="blue"
-          />
-          <StatCard 
-            title="Productos activos" 
-            value="156" 
-            icon={Package}
-            color="purple"
-          />
-          <StatCard 
-            title="Stock bajo" 
-            value="8" 
-            change="+2" 
-            trend="down"
-            icon={AlertCircle}
-            color="amber"
-          />
-        </div>
-
-        {/* Consulta de ventas mejorada */}
-        <div className="rounded-2xl border border-slate-200 bg-white/90 backdrop-blur shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-slate-200 bg-slate-50">
-            <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-              <BarChart3 size={20} />
-              Resumen de Ventas
-            </h2>
-          </div>
-          
-          <div className="p-6">
-            {/* Selector de período */}
-            <div className="flex flex-wrap gap-2 mb-5">
-              {["hoy", "semana", "mes"].map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setPeriod(p)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                    period === p
-                      ? "bg-blue-600 text-white shadow-sm"
-                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                  }`}
-                >
-                  {p.charAt(0).toUpperCase() + p.slice(1)}
-                </button>
-              ))}
+        {/* Grid principal: Estadísticas + Actividad reciente */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Columna izquierda y central - Estadísticas (2/3 del espacio) */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Estadísticas principales */}
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              <StatCard 
+                title="Ventas del mes" 
+                value="S/ 5,230" 
+                change="+12.5%" 
+                trend="up"
+                icon={DollarSign}
+                color="green"
+              />
+              <StatCard 
+                title="Transacciones" 
+                value="320" 
+                change="+8.3%" 
+                trend="up"
+                icon={ShoppingCart}
+                color="blue"
+              />
+              <StatCard 
+                title="Productos activos" 
+                value="156" 
+                icon={Package}
+                color="purple"
+              />
+              <StatCard 
+                title="Stock bajo" 
+                value="8" 
+                change="+2" 
+                trend="down"
+                icon={AlertCircle}
+                color="amber"
+              />
             </div>
 
-            {/* Resultado */}
-            <div className="rounded-xl bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <p className="text-sm text-emerald-700 mb-1">Ventas de {period === "hoy" ? "hoy" : period === "semana" ? "esta semana" : "este mes"}</p>
-                  <div className="text-3xl font-bold text-emerald-900">S/ {currentData.total.toFixed(2)}</div>
+            {/* Consulta de ventas mejorada */}
+            <div className="rounded-2xl border border-slate-200 bg-white/90 backdrop-blur shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-slate-200 bg-slate-50">
+                <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                  <BarChart3 size={20} />
+                  Resumen de Ventas
+                </h2>
+              </div>
+              
+              <div className="p-6">
+                {/* Selector de período */}
+                <div className="flex flex-wrap gap-2 mb-5">
+                  {["hoy", "semana", "mes"].map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => setPeriod(p)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                        period === p
+                          ? "bg-blue-600 text-white shadow-sm"
+                          : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                      }`}
+                    >
+                      {p.charAt(0).toUpperCase() + p.slice(1)}
+                    </button>
+                  ))}
                 </div>
-                <div className="text-right">
-                  <div className="inline-flex items-center gap-1 rounded-lg bg-green-100 px-3 py-1 text-sm font-semibold text-green-700">
-                    <TrendingUp size={14} />
-                    {currentData.change}
+
+                {/* Resultado */}
+                <div className="rounded-xl bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <p className="text-sm text-emerald-700 mb-1">Ventas de {period === "hoy" ? "hoy" : period === "semana" ? "esta semana" : "este mes"}</p>
+                      <div className="text-3xl font-bold text-emerald-900">S/ {currentData.total.toFixed(2)}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="inline-flex items-center gap-1 rounded-lg bg-green-100 px-3 py-1 text-sm font-semibold text-green-700">
+                        <TrendingUp size={14} />
+                        {currentData.change}
+                      </div>
+                      <p className="text-xs text-emerald-700 mt-2">{currentData.transactions} transacciones</p>
+                    </div>
                   </div>
-                  <p className="text-xs text-emerald-700 mt-2">{currentData.transactions} transacciones</p>
+
+                  {/* Botón WhatsApp */}
+                  <button 
+                    onClick={handleWhatsAppShare}
+                    className="flex items-center gap-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2.5 transition shadow-sm hover:shadow-md"
+                  >
+                    <Send size={16} />
+                    Enviar por WhatsApp
+                  </button>
+
+                  {showWhatsAppSuccess && (
+                    <div className="mt-3 rounded-lg bg-green-100 border border-green-300 text-green-800 text-sm px-4 py-2">
+                      ✓ Resumen enviado correctamente
+                    </div>
+                  )}
                 </div>
               </div>
+            </div>
+          </div>
 
-              {/* Botón WhatsApp */}
-              <button 
-                onClick={handleWhatsAppShare}
-                className="flex items-center gap-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2.5 transition shadow-sm hover:shadow-md"
-              >
-                <Send size={16} />
-                Enviar por WhatsApp
-              </button>
-
-              {showWhatsAppSuccess && (
-                <div className="mt-3 rounded-lg bg-green-100 border border-green-300 text-green-800 text-sm px-4 py-2">
-                  ✓ Resumen enviado correctamente
+          {/* Columna derecha - Actividad reciente (1/3 del espacio) */}
+          <div className="space-y-6">
+            {/* Actividad reciente */}
+            <div className="rounded-2xl border border-slate-200 bg-white/90 backdrop-blur shadow-sm overflow-hidden">
+              <div className="p-5 border-b border-slate-200 bg-slate-50">
+                <h3 className="font-semibold text-slate-900">Actividad Reciente</h3>
+              </div>
+              <div className="p-5 space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="rounded-lg bg-green-100 p-2 flex-shrink-0">
+                    <ShoppingCart size={16} className="text-green-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-900">Nueva venta</p>
+                    <p className="text-xs text-slate-600 truncate">F001-101150 • S/ 125.00</p>
+                    <p className="text-xs text-slate-500 mt-1">Hace 5 min</p>
+                  </div>
                 </div>
-              )}
+                
+                <div className="flex items-start gap-3">
+                  <div className="rounded-lg bg-blue-100 p-2 flex-shrink-0">
+                    <Package size={16} className="text-blue-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-900">Stock actualizado</p>
+                    <p className="text-xs text-slate-600 truncate">Producto #234 • +50 unid.</p>
+                    <p className="text-xs text-slate-500 mt-1">Hace 1 hora</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="rounded-lg bg-amber-100 p-2 flex-shrink-0">
+                    <AlertCircle size={16} className="text-amber-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-900">Stock bajo</p>
+                    <p className="text-xs text-slate-600 truncate">Producto #123 • 3 unid.</p>
+                    <p className="text-xs text-slate-500 mt-1">Hace 2 horas</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="rounded-lg bg-purple-100 p-2 flex-shrink-0">
+                    <CreditCard size={16} className="text-purple-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-900">Pago recibido</p>
+                    <p className="text-xs text-slate-600 truncate">F001-101149 • Verificado</p>
+                    <p className="text-xs text-slate-500 mt-1">Hace 3 horas</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 border-t border-slate-200">
+                <Link href="/reports" className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center justify-center gap-1">
+                  Ver todo el historial
+                  <ArrowUpRight size={14} />
+                </Link>
+              </div>
+            </div>
+
+            {/* Productos más vendidos */}
+            <div className="rounded-2xl border border-slate-200 bg-white/90 backdrop-blur shadow-sm overflow-hidden">
+              <div className="p-5 border-b border-slate-200 bg-slate-50">
+                <h3 className="font-semibold text-slate-900">Top Productos</h3>
+              </div>
+              <div className="p-5 space-y-3">
+                {[
+                  { name: "Producto A", sales: 45, amount: 1125 },
+                  { name: "Producto B", sales: 38, amount: 950 },
+                  { name: "Producto C", sales: 32, amount: 800 },
+                  { name: "Producto D", sales: 28, amount: 700 },
+                ].map((product, idx) => (
+                  <div key={idx} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xs font-bold grid place-items-center flex-shrink-0">
+                        {idx + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-900 truncate">{product.name}</p>
+                        <p className="text-xs text-slate-600">{product.sales} ventas</p>
+                      </div>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-sm font-semibold text-slate-900">S/ {product.amount}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -223,7 +320,7 @@ export default function Dashboard(){
         {/* Acciones rápidas */}
         <div>
           <h2 className="text-xl font-semibold text-slate-900 mb-4">Acciones Rápidas</h2>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
             <QuickActionCard 
               title="Realizar Venta" 
               desc="Registra nuevas ventas y genera tickets automáticamente" 
