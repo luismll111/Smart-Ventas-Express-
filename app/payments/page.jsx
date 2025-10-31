@@ -1,6 +1,8 @@
 ﻿"use client";
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import LayoutShell from "../../components/LayoutShell";
+import { AlertCircle, CheckCircle, Clock, Download, Upload, CreditCard, FileText, ArrowLeft } from "lucide-react";
 
 const initialRows = [
   { id: 1, emision: "02-10-2025", pago: "-", tipo:"FACTURA", numero:"F001-101150", monto:49.00, cancelado:0, estado:"PENDIENTE DE PAGO" },
@@ -9,20 +11,36 @@ const initialRows = [
 function BannerPendiente({ totalPendiente }){
   if (totalPendiente <= 0) return null;
   return (
-    <div className="rounded-md bg-yellow-400 text-black px-3 py-2 text-sm flex items-center justify-between">
-      <div className="font-medium">
-        Tienes una factura pendiente de pago por S/ {totalPendiente.toFixed(2)}
+    <div className="rounded-xl border border-amber-300 bg-gradient-to-r from-amber-50 to-amber-100 px-5 py-4 shadow-sm">
+      <div className="flex items-start gap-3">
+        <AlertCircle className="text-amber-600 flex-shrink-0 mt-0.5" size={20}/>
+        <div className="flex-1">
+          <div className="font-semibold text-amber-900">Factura pendiente de pago</div>
+          <div className="text-sm text-amber-800 mt-1">
+            Tienes una factura pendiente por <span className="font-bold">S/ {totalPendiente.toFixed(2)}</span>
+          </div>
+        </div>
+        <a href="#subir-pago" className="rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium px-4 py-2 transition shadow-sm">
+          Subir pago
+        </a>
       </div>
-      <a href="#subir-pago" className="underline">Subir mi pago</a>
     </div>
   );
 }
 
-function InfoCard({ title, children }){
+function InfoCard({ title, icon: Icon, children, highlight }){
   return (
-    <div className="rounded-2xl border bg-white/80 backdrop-blur p-5 shadow-sm">
-      <div className="text-base font-semibold">{title}</div>
-      <div className="text-sm text-slate-600 mt-1">{children}</div>
+    <div className="rounded-2xl border border-slate-200 bg-white/90 backdrop-blur p-6 shadow-sm hover:shadow-md transition">
+      <div className="flex items-center gap-3 mb-3">
+        {Icon && <div className="rounded-lg bg-blue-50 p-2"><Icon className="text-blue-600" size={20}/></div>}
+        <div className="text-base font-semibold text-slate-900">{title}</div>
+      </div>
+      <div className="text-sm text-slate-600 leading-relaxed">{children}</div>
+      {highlight && (
+        <div className="mt-4 pt-4 border-t border-slate-100">
+          {highlight}
+        </div>
+      )}
     </div>
   );
 }
@@ -59,82 +77,138 @@ export default function PaymentsPage(){
   };
 
   return (
-    <div className="grid gap-4">
-      <BannerPendiente totalPendiente={deudaTotal} />
+    <LayoutShell>
+      <div className="grid gap-6">
+        <BannerPendiente totalPendiente={deudaTotal} />
 
-      {/* titulo */}
-      <div className="rounded-2xl border bg-white/80 backdrop-blur p-5 shadow-sm">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <h2 className="text-lg font-semibold">Mi Deuda</h2>
-          <Link href="/dashboard" className="text-blue-600 text-sm">Regresar al menú Smart Ventas Express</Link>
-        </div>
-        <p className="text-xs text-slate-500 mt-1">Mis comprobantes emitidos por Smart Ventas Express</p>
-      </div>
-
-      {/* tarjetas de info */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <InfoCard title="Informacion importante">
-          En esta interfaz podras llevar un control de todos tus pagos. Cada pago que realices lo registras con el boton <b>SUBIR PAGO</b>. Una vez subido, pasa a revision en 48 a 72 horas habiles.
-        </InfoCard>
-        <InfoCard title="Informacion de deuda">
-          <div className="text-sm">
-            <div>Nro comprobantes en deuda: <b>{deudaCount}</b></div>
-            <div>Total de deuda: <b>S/ {deudaTotal.toFixed(2)}</b></div>
+      {/* Header mejorado */}
+      <div className="rounded-2xl border border-slate-200 bg-white/90 backdrop-blur p-6 shadow-sm">
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+              <div className="rounded-xl bg-blue-100 p-2">
+                <CreditCard className="text-blue-600" size={24}/>
+              </div>
+              Registro de Pagos
+            </h1>
+            <p className="text-sm text-slate-600 mt-2">Gestiona y controla todos tus comprobantes de pago</p>
           </div>
+          <Link href="/dashboard" className="flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium transition">
+            <ArrowLeft size={16}/>
+            Volver al Dashboard
+          </Link>
+        </div>
+      </div>
+
+      {/* Tarjetas de información mejoradas */}
+      <div className="grid md:grid-cols-2 gap-5">
+        <InfoCard 
+          title="Información importante" 
+          icon={FileText}
+        >
+          <p className="mb-2">En esta interfaz podrás llevar un control completo de todos tus pagos pendientes y confirmados.</p>
+          <p>Cada pago que realices lo registras con el botón <span className="font-semibold text-blue-600">SUBIR PAGO</span>. Una vez subido, pasa a revisión en <span className="font-semibold">48 a 72 horas hábiles</span>.</p>
+        </InfoCard>
+        <InfoCard 
+          title="Estado de deuda" 
+          icon={AlertCircle}
+          highlight={
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center p-3 rounded-lg bg-red-50 border border-red-100">
+                <div className="text-2xl font-bold text-red-600">{deudaCount}</div>
+                <div className="text-xs text-red-600 font-medium mt-1">Comprobantes pendientes</div>
+              </div>
+              <div className="text-center p-3 rounded-lg bg-amber-50 border border-amber-100">
+                <div className="text-2xl font-bold text-amber-600">S/ {deudaTotal.toFixed(2)}</div>
+                <div className="text-xs text-amber-600 font-medium mt-1">Total adeudado</div>
+              </div>
+            </div>
+          }
+        >
+          Mantén tu cuenta al día para seguir disfrutando de nuestros servicios sin interrupciones.
         </InfoCard>
       </div>
 
-      {/* tabla */}
-      <div className="rounded-2xl border bg-white/80 backdrop-blur p-4 shadow-sm" id="subir-pago">
+      {/* Tabla moderna mejorada */}
+      <div className="rounded-2xl border border-slate-200 bg-white/90 backdrop-blur shadow-sm" id="subir-pago">
+        <div className="p-6 border-b border-slate-200">
+          <h2 className="text-lg font-semibold text-slate-900">Mis Comprobantes</h2>
+          <p className="text-sm text-slate-600 mt-1">Historial completo de facturas y pagos</p>
+        </div>
         <div className="overflow-auto">
-          <table className="min-w-[900px] w-full text-sm">
-            <thead>
-              <tr className="text-left text-slate-600">
-                <th className="py-2 px-2">N°</th>
-                <th className="py-2 px-2">F. Emision</th>
-                <th className="py-2 px-2">F. Pago</th>
-                <th className="py-2 px-2">Comprobante</th>
-                <th className="py-2 px-2">Numero</th>
-                <th className="py-2 px-2">Monto</th>
-                <th className="py-2 px-2">M. Cancelado</th>
-                <th className="py-2 px-2">Estado</th>
-                <th className="py-2 px-2">Subir Pago</th>
+          <table className="min-w-[1000px] w-full text-sm">
+            <thead className="bg-slate-50 border-b border-slate-200">
+              <tr className="text-left text-slate-700 font-medium">
+                <th className="py-3 px-4">N°</th>
+                <th className="py-3 px-4">F. Emisión</th>
+                <th className="py-3 px-4">F. Pago</th>
+                <th className="py-3 px-4">Tipo</th>
+                <th className="py-3 px-4">Número</th>
+                <th className="py-3 px-4 text-right">Monto</th>
+                <th className="py-3 px-4 text-right">Cancelado</th>
+                <th className="py-3 px-4">Estado</th>
+                <th className="py-3 px-4 text-center">Acciones</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-slate-100">
               {rows.map((r,idx)=>{
                 const pending = r.estado === "PENDIENTE DE PAGO";
                 const reviewing = r.estado === "EN REVISION";
+                const paid = r.estado === "PAGADO";
                 return (
-                  <tr key={r.id} className={`border-t ${pending ? "bg-red-50" : reviewing ? "bg-yellow-50" : "bg-green-50"}`}>
-                    <td className="py-2 px-2">{idx+1}</td>
-                    <td className="py-2 px-2">{r.emision}</td>
-                    <td className="py-2 px-2">{r.pago}</td>
-                    <td className="py-2 px-2">{r.tipo}</td>
-                    <td className="py-2 px-2">
-                      {r.numero}{" "}
-                      <a className="ml-2 inline-block rounded-full bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-0.5"
-                         href={`/invoices/${r.numero}.pdf`} download>
-                        Descargar
-                      </a>
-                    </td>
-                    <td className="py-2 px-2">S/ {r.monto.toFixed(2)}</td>
-                    <td className="py-2 px-2">S/ {r.cancelado.toFixed(2)}</td>
-                    <td className="py-2 px-2">
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs
-                        ${pending ? "bg-red-600 text-white" : reviewing ? "bg-yellow-500 text-black" : "bg-green-600 text-white"}`}>
-                        {r.estado}
+                  <tr key={r.id} className="hover:bg-slate-50 transition">
+                    <td className="py-4 px-4 font-medium text-slate-900">{idx+1}</td>
+                    <td className="py-4 px-4 text-slate-600">{r.emision}</td>
+                    <td className="py-4 px-4 text-slate-600">{r.pago}</td>
+                    <td className="py-4 px-4">
+                      <span className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                        <FileText size={12}/>
+                        {r.tipo}
                       </span>
                     </td>
-                    <td className="py-2 px-2">
+                    <td className="py-4 px-4">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-slate-900">{r.numero}</span>
+                        <a className="inline-flex items-center gap-1 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-1 transition shadow-sm"
+                           href={`/invoices/${r.numero}.pdf`} download>
+                          <Download size={12}/>
+                          PDF
+                        </a>
+                      </div>
+                    </td>
+                    <td className="py-4 px-4 text-right font-semibold text-slate-900">S/ {r.monto.toFixed(2)}</td>
+                    <td className="py-4 px-4 text-right font-semibold text-slate-600">S/ {r.cancelado.toFixed(2)}</td>
+                    <td className="py-4 px-4">
+                      {pending && (
+                        <span className="inline-flex items-center gap-1.5 rounded-lg bg-red-100 border border-red-200 px-2.5 py-1 text-xs font-semibold text-red-700">
+                          <AlertCircle size={12}/>
+                          PENDIENTE
+                        </span>
+                      )}
+                      {reviewing && (
+                        <span className="inline-flex items-center gap-1.5 rounded-lg bg-amber-100 border border-amber-200 px-2.5 py-1 text-xs font-semibold text-amber-700">
+                          <Clock size={12}/>
+                          EN REVISIÓN
+                        </span>
+                      )}
+                      {paid && (
+                        <span className="inline-flex items-center gap-1.5 rounded-lg bg-green-100 border border-green-200 px-2.5 py-1 text-xs font-semibold text-green-700">
+                          <CheckCircle size={12}/>
+                          PAGADO
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-4 px-4 text-center">
                       {pending ? (
-                        <button className="rounded-md bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-xs"
+                        <button className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 text-xs font-medium transition shadow-sm hover:shadow-md"
                                 onClick={()=>{ setUploadRow(r); setShowUpload(true); }}>
+                          <Upload size={14}/>
                           SUBIR PAGO
                         </button>
                       ) : (
-                        <button className="rounded-md border px-3 py-1.5 text-xs" onClick={()=>alert("Ver detalle (demo)")}>
-                          Ver
+                        <button className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 text-slate-700 px-3 py-2 text-xs font-medium transition"
+                                onClick={()=>alert("Ver detalle (demo)")}>
+                          Ver detalle
                         </button>
                       )}
                     </td>
@@ -146,45 +220,106 @@ export default function PaymentsPage(){
         </div>
       </div>
 
-      {/* Modal subir pago (demo) */}
+      {/* Modal mejorado */}
       {showUpload && (
-        <div className="fixed inset-0 z-50 bg-black/40 grid place-items-center" onClick={()=>setShowUpload(false)}>
-          <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl" onClick={(e)=>e.stopPropagation()}>
-            <div className="text-base font-semibold">Subir pago</div>
-            <div className="text-xs text-slate-500 mb-3">Para: {uploadRow?.numero}</div>
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm grid place-items-center p-4" onClick={()=>setShowUpload(false)}>
+          <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl" onClick={(e)=>e.stopPropagation()}>
+            {/* Header del modal */}
+            <div className="border-b border-slate-200 p-6">
+              <div className="flex items-center gap-3">
+                <div className="rounded-xl bg-blue-100 p-2">
+                  <Upload className="text-blue-600" size={24}/>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900">Registrar Pago</h3>
+                  <p className="text-sm text-slate-600 mt-0.5">Comprobante: <span className="font-mono font-semibold text-slate-900">{uploadRow?.numero}</span></p>
+                </div>
+              </div>
+            </div>
 
-            <form className="grid gap-3" onSubmit={(e)=>{
+            {/* Contenido del modal */}
+            <form className="p-6 space-y-5" onSubmit={(e)=>{
               e.preventDefault();
-              alert("Voucher recibido (demo). Estado: EN REVISION");
+              if (!ref.trim() || !file) {
+                alert("Por favor ingresa la referencia y adjunta el voucher.");
+                return;
+              }
+              setRows(prev => prev.map(r => r.id === uploadRow.id ? { ...r, estado:"EN REVISION" } : r));
               setShowUpload(false);
+              alert("✅ Voucher recibido correctamente. Tu pago está EN REVISIÓN.");
             }}>
               <label className="block">
-                <span className="text-sm">Metodo</span>
-                <select className="mt-1 w-full rounded-lg border px-3 py-2 text-sm">
+                <span className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                  <CreditCard size={16}/>
+                  Método de pago
+                </span>
+                <select 
+                  className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  value={method}
+                  onChange={(e)=>setMethod(e.target.value)}
+                >
                   <option>Yape</option>
                   <option>Plin</option>
-                  <option>Transferencia</option>
-                  <option>Tarjeta</option>
+                  <option>Transferencia bancaria</option>
+                  <option>Tarjeta de crédito/débito</option>
                 </select>
               </label>
+
               <label className="block">
-                <span className="text-sm">Referencia</span>
-                <input className="mt-1 w-full rounded-lg border px-3 py-2 text-sm" placeholder="Nro operacion / ref"/>
-              </label>
-              <label className="block">
-                <span className="text-sm">Adjuntar voucher (jpg, png, pdf)</span>
-                <input className="mt-1 w-full text-sm" type="file" accept=".jpg,.jpeg,.png,.pdf"/>
+                <span className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                  <FileText size={16}/>
+                  Número de operación / Referencia
+                </span>
+                <input 
+                  className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" 
+                  placeholder="Ej: 0012345678"
+                  value={ref}
+                  onChange={(e)=>setRef(e.target.value)}
+                />
               </label>
 
-              <div className="flex items-center justify-end gap-2 mt-2">
-                <button type="button" className="rounded-md border px-3 py-1.5 text-sm" onClick={()=>setShowUpload(false)}>Cancelar</button>
-                <button type="submit" className="rounded-md bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-sm">Confirmar</button>
+              <label className="block">
+                <span className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                  <Upload size={16}/>
+                  Adjuntar voucher (JPG, PNG, PDF)
+                </span>
+                <div className="mt-2">
+                  <input 
+                    className="w-full text-sm file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 file:cursor-pointer cursor-pointer" 
+                    type="file" 
+                    accept=".jpg,.jpeg,.png,.pdf"
+                    onChange={(e)=>setFile(e.target.files?.[0])}
+                  />
+                </div>
+                {file && (
+                  <div className="mt-2 text-xs text-slate-600 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                    ✅ Archivo seleccionado: <span className="font-semibold">{file.name}</span>
+                  </div>
+                )}
+              </label>
+
+              {/* Footer del modal */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+                <button 
+                  type="button" 
+                  className="rounded-lg border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 text-slate-700 px-5 py-2.5 text-sm font-medium transition"
+                  onClick={()=>setShowUpload(false)}
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 text-sm font-medium transition shadow-sm hover:shadow-md"
+                >
+                  Confirmar y enviar
+                </button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-    </div>
+      </div>
+    </LayoutShell>
   );
 }
