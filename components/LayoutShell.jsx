@@ -1,8 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Home, ShoppingCart, Package, BarChart3, Layers, LogOut, CreditCard } from "lucide-react";
+import { Menu, X, Home, ShoppingCart, Package, BarChart3, Layers, LogOut, CreditCard, User, Settings, Bell, ChevronDown } from "lucide-react";
 
 const nav = [
   { href: "/dashboard", label: "Inicio", Icon: Home },
@@ -43,6 +43,40 @@ function SideNav({ onClickItem }) {
 
 export default function LayoutShell({ children }) {
   const [open, setOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [userName, setUserName] = useState("Admin");
+  const [userEmail, setUserEmail] = useState("admin@smartventas.com");
+
+  // Cargar datos del perfil desde localStorage
+  useEffect(() => {
+    const savedProfile = localStorage.getItem("userProfile");
+    if (savedProfile) {
+      const profile = JSON.parse(savedProfile);
+      setUserName(profile.name || "Admin");
+      setUserEmail(profile.email || "admin@smartventas.com");
+    }
+  }, []);
+
+  // Actualizar cuando cambie el perfil
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedProfile = localStorage.getItem("userProfile");
+      if (savedProfile) {
+        const profile = JSON.parse(savedProfile);
+        setUserName(profile.name || "Admin");
+        setUserEmail(profile.email || "admin@smartventas.com");
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("profileUpdated", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("profileUpdated", handleStorageChange);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white">
@@ -52,15 +86,91 @@ export default function LayoutShell({ children }) {
             <span className="font-semibold text-slate-900">Smart Ventas Express</span>
           </div>
           <div className="flex items-center gap-4">
-            {/* Usuario en desktop */}
-            <div className="hidden md:flex items-center gap-3">
-              <div className="text-right">
-                <p className="text-xs text-slate-500">Usuario actual</p>
-                <p className="text-sm font-semibold text-slate-900">Admin</p>
-              </div>
-              <div className="w-9 h-9 rounded-full bg-blue-600 text-white grid place-items-center font-bold text-sm">
-                A
-              </div>
+            {/* Usuario en desktop con dropdown */}
+            <div className="hidden md:block relative">
+              <button
+                onClick={() => setProfileOpen(!profileOpen)}
+                className="flex items-center gap-3 rounded-lg hover:bg-slate-50 px-3 py-2 transition-colors"
+              >
+                <div className="text-right">
+                  <p className="text-xs text-slate-500">Usuario actual</p>
+                  <p className="text-sm font-semibold text-slate-900">{userName}</p>
+                </div>
+                <div className="w-9 h-9 rounded-full bg-blue-600 text-white grid place-items-center font-bold text-sm">
+                  {userName.charAt(0).toUpperCase()}
+                </div>
+                <ChevronDown
+                  size={16}
+                  className={`text-slate-500 transition-transform ${profileOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {/* Dropdown menu */}
+              {profileOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setProfileOpen(false)}
+                  />
+                  <div className="absolute right-0 top-full mt-2 w-64 rounded-xl border border-slate-200 bg-white shadow-lg z-50 py-2">
+                    {/* Header del perfil */}
+                    <div className="px-4 py-3 border-b border-slate-200">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 text-white grid place-items-center font-bold text-lg">
+                          {userName.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-slate-900">{userName}</p>
+                          <p className="text-xs text-slate-500 truncate">{userEmail}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Opciones del menú */}
+                    <div className="py-2">
+                      <Link
+                        href="/profile"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors text-sm text-slate-700"
+                      >
+                        <User size={18} className="text-slate-500" />
+                        <span>Mi Perfil</span>
+                      </Link>
+                      <Link
+                        href="/settings"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors text-sm text-slate-700"
+                      >
+                        <Settings size={18} className="text-slate-500" />
+                        <span>Configuración</span>
+                      </Link>
+                      <Link
+                        href="/notifications"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors text-sm text-slate-700"
+                      >
+                        <Bell size={18} className="text-slate-500" />
+                        <span>Notificaciones</span>
+                      </Link>
+                    </div>
+
+                    {/* Separador */}
+                    <div className="border-t border-slate-200 my-2" />
+
+                    {/* Cerrar sesión */}
+                    <div className="px-2 pb-2">
+                      <Link
+                        href="/logout"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-red-50 transition-colors text-sm text-red-600 font-medium"
+                      >
+                        <LogOut size={18} />
+                        <span>Cerrar Sesión</span>
+                      </Link>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
             {/* Botón menú mobile */}
             <button
