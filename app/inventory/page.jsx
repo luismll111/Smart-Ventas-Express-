@@ -396,8 +396,8 @@ export default function InventoryPage(){
           <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white/90 backdrop-blur p-5 shadow-sm">
             <div className="text-sm text-slate-600">
               Mostrando <span className="font-semibold text-slate-900">{(page - 1) * 10 + 1}</span> a{" "}
-              <span className="font-semibold text-slate-900">{Math.min(page * 10, filteredData.length)}</span> de{" "}
-              <span className="font-semibold text-slate-900">{filteredData.length}</span> productos
+              <span className="font-semibold text-slate-900">{Math.min(page * 10, filtrar.length)}</span> de{" "}
+              <span className="font-semibold text-slate-900">{filtrar.length}</span> productos
             </div>
             
             <div className="flex items-center gap-2">
