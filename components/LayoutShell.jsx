@@ -50,12 +50,25 @@ export default function LayoutShell({ children }) {
             <div className="h-9 w-9 rounded-xl bg-blue-600 text-white grid place-items-center font-bold text-lg shadow-md">S</div>
             <span className="font-semibold text-base">Bienvenido a Smart Ventas Express</span>
           </div>
-          <button
-            className="md:hidden inline-flex items-center gap-2 rounded-lg border px-3 py-2 hover:bg-slate-50 transition"
-            onClick={() => setOpen(v=>!v)} aria-label="Abrir menu"
-          >
-            {open ? <X size={18}/> : <Menu size={18}/>} Menu
-          </button>
+          <div className="flex items-center gap-4">
+            {/* Usuario en desktop */}
+            <div className="hidden md:flex items-center gap-3">
+              <div className="text-right">
+                <p className="text-xs text-slate-600">Usuario actual</p>
+                <p className="text-sm font-semibold text-slate-900">Admin</p>
+              </div>
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 text-white grid place-items-center font-bold shadow-md">
+                A
+              </div>
+            </div>
+            {/* Botón menú mobile */}
+            <button
+              className="md:hidden inline-flex items-center gap-2 rounded-lg border px-3 py-2 hover:bg-slate-50 transition"
+              onClick={() => setOpen(v=>!v)} aria-label="Abrir menu"
+            >
+              {open ? <X size={18}/> : <Menu size={18}/>} Menu
+            </button>
+          </div>
         </div>
       </header>
 
@@ -70,7 +83,7 @@ export default function LayoutShell({ children }) {
             </aside>
           </div>
         )}
-        <main className="p-6 md:p-8 max-w-[1400px]">{children}</main>
+        <main className="p-6 md:p-8">{children}</main>
       </div>
     </div>
   );
